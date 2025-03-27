@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public Text resultText;
     public Button shootButton;
     public Button replayButton;
+    public Button closeButton;
 
     private enum Choice { Rock, Paper, Scissors, None }
     private Choice playerChoice = Choice.None;
@@ -65,5 +66,12 @@ public class GameManager : MonoBehaviour
         resultText.text = "Result: ";
         shootButton.interactable = true;
         replayButton.interactable = false;
+    }
+
+
+    //Close button returns to main menu scene
+    public void Close()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 }

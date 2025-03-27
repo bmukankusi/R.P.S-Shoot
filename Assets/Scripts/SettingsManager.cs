@@ -3,37 +3,86 @@ using UnityEngine.UI;
 
 public class SettingsManager : MonoBehaviour
 {
-    public Toggle musicToggle;
-    public Toggle sfxToggle;
-    public Dropdown backgroundDropdown;
+    [Header("UI Elements")]
+    public Button musicButton;
+    public Button soundEffectsButton;
+    public Button backgroundColorButton;
+
+    public Image musicButtonIcon;
+    public Image soundEffectsButtonIcon;
+    public Sprite musicOnSprite;
+    public Sprite musicOffSprite;
+    public Sprite soundOnSprite;
+    public Sprite soundOffSprite;
+
+    [Header("Background Colors")]
+    public Color[] backgroundColors = { Color.black, Color.white, Color.green, new Color(1f, 0.5f, 0f) }; // Black, White, Green, Orange
+    private int currentColorIndex = 0;
+
+    private const string MUSIC_PREF = "MusicMuted";
+    private const string SOUND_PREF = "SoundMuted";
+    private const string COLOR_PREF = "BackgroundColorIndex";
 
     private void Start()
     {
-        LoadSettings();
+        // Load saved settings
+        bool isMusicMuted = PlayerPrefs.GetInt(MUSIC_PREF, 0) == 1;
+        bool isSoundMuted = PlayerPrefs.GetInt(SOUND_PREF, 0) == 1;
+        currentColorIndex = PlayerPrefs.GetInt(COLOR_PREF, 0);
+
+        UpdateMusicUI(isMusicMuted);
+        UpdateSoundUI(isSoundMuted);
+        ApplyBackgroundColor();
+
+        // Add button listeners
+        musicButton.onClick.AddListener(ToggleMusic);
+        soundEffectsButton.onClick.AddListener(ToggleSoundEffects);
+        backgroundColorButton.onClick.AddListener(ChangeBackgroundColor);
     }
 
-    public void ToggleMusic(bool isOn)
+    private void ToggleMusic()
     {
-        PlayerPrefs.SetInt("Music", isOn ? 1 : 0);
-        // Implement audio control here
+        bool isMuted = PlayerPrefs.GetInt(MUSIC_PREF, 0) == 1;
+        isMuted = !isMuted;
+        PlayerPrefs.SetInt(MUSIC_PREF, isMuted ? 1 : 0);
+        PlayerPrefs.Save();
+
+        UpdateMusicUI(isMuted);
     }
 
-    public void ToggleSFX(bool isOn)
+    private void ToggleSoundEffects()
     {
-        PlayerPrefs.SetInt("SFX", isOn ? 1 : 0);
-        // Implement SFX control here
+        bool isMuted = PlayerPrefs.GetInt(SOUND_PREF, 0) == 1;
+        isMuted = !isMuted;
+        PlayerPrefs.SetInt(SOUND_PREF, isMuted ? 1 : 0);
+        PlayerPrefs.Save();
+
+        UpdateSoundUI(isMuted);
     }
 
-    public void ChangeBackground(int index)
+    private void ChangeBackgroundColor()
     {
-        PlayerPrefs.SetInt("Background", index);
-        // Change background color here
+        currentColorIndex = (currentColorIndex + 1) % backgroundColors.Length;
+        PlayerPrefs.SetInt(COLOR_PREF, currentColorIndex);
+        PlayerPrefs.Save();
+
+        ApplyBackgroundColor();
     }
 
-    private void LoadSettings()
+    private void UpdateMusicUI(bool isMuted)
     {
-        musicToggle.isOn = PlayerPrefs.GetInt("Music", 1) == 1;
-        sfxToggle.isOn = PlayerPrefs.GetInt("SFX", 1) == 1;
-        backgroundDropdown.value = PlayerPrefs.GetInt("Background", 0);
+        musicButtonIcon.sprite = isMuted ? musicOffSprite : musicOnSprite;
+        AudioListener.pause = isMuted; // Mutes all background music
+    }
+
+    private void UpdateSoundUI(bool isMuted)
+    {
+        soundEffectsButtonIcon.sprite = isMuted ? soundOffSprite : soundOnSprite;
+        AudioListener.volume = isMuted ? 0f : 1f; // Mutes all sound effects
+    }
+
+    private void ApplyBackgroundColor()
+    {
+        Camera.main.backgroundColor = backgroundColors[currentColorIndex];
     }
 }
