@@ -1,88 +1,110 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// SettingsManager script to manage audio settings, background color, and save settings to PlayerPrefs
+/// </summary>
 public class SettingsManager : MonoBehaviour
 {
-    [Header("UI Elements")]
-    public Button musicButton;
-    public Button soundEffectsButton;
-    public Button backgroundColorButton;
+    [Header("Audio Settings")]
+    public Slider musicSlider; 
+    public Toggle sfxToggle;   
 
-    public Image musicButtonIcon;
-    public Image soundEffectsButtonIcon;
-    public Sprite musicOnSprite;
-    public Sprite musicOffSprite;
-    public Sprite soundOnSprite;
-    public Sprite soundOffSprite;
+    [Header("Background Settings")]
+    public GameObject[] backgroundPanels;
+    public Button backgroundChangeButton; 
 
-    [Header("Background Colors")]
-    public Color[] backgroundColors = { Color.black, Color.white, Color.green, new Color(1f, 0.5f, 0f) }; // Black, White, Green, Orange
+    
     private int currentColorIndex = 0;
 
-    private const string MUSIC_PREF = "MusicMuted";
-    private const string SOUND_PREF = "SoundMuted";
-    private const string COLOR_PREF = "BackgroundColorIndex";
+    private AudioSource backgroundMusic; 
 
-    private void Start()
+    void Start()
     {
-        // Load saved settings
-        bool isMusicMuted = PlayerPrefs.GetInt(MUSIC_PREF, 0) == 1;
-        bool isSoundMuted = PlayerPrefs.GetInt(SOUND_PREF, 0) == 1;
-        currentColorIndex = PlayerPrefs.GetInt(COLOR_PREF, 0);
+        // Find and Assign Background Music
+        backgroundMusic = GameObject.FindWithTag("BackgroundMusic")?.GetComponent<AudioSource>();
 
-        UpdateMusicUI(isMusicMuted);
-        UpdateSoundUI(isSoundMuted);
-        ApplyBackgroundColor();
+        //  Load Previous Settings
+        LoadSettings();
 
-        // Add button listeners
-        musicButton.onClick.AddListener(ToggleMusic);
-        soundEffectsButton.onClick.AddListener(ToggleSoundEffects);
-        backgroundColorButton.onClick.AddListener(ChangeBackgroundColor);
+        //  Add Click Listener for Background Color Change
+        if (backgroundChangeButton != null)
+            backgroundChangeButton.onClick.AddListener(ChangeBackgroundColor);
+
+        //  Attach Slider Listener
+        if (musicSlider != null)
+            musicSlider.onValueChanged.AddListener(SetMusicVolume);
     }
 
-    private void ToggleMusic()
+    /// <summary>
+    /// Set Music Volume, and Save to PlayerPrefs
+    /// </summary>
+    /// <param name="volume"></param>
+    public void SetMusicVolume(float volume)
     {
-        bool isMuted = PlayerPrefs.GetInt(MUSIC_PREF, 0) == 1;
-        isMuted = !isMuted;
-        PlayerPrefs.SetInt(MUSIC_PREF, isMuted ? 1 : 0);
-        PlayerPrefs.Save();
-
-        UpdateMusicUI(isMuted);
+        if (backgroundMusic != null)
+        {
+            backgroundMusic.volume = volume;
+        }
+        PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 
-    private void ToggleSoundEffects()
+    // Enable/Disable Sound Effects
+    public void ToggleSFX(bool isOn)
     {
-        bool isMuted = PlayerPrefs.GetInt(SOUND_PREF, 0) == 1;
-        isMuted = !isMuted;
-        PlayerPrefs.SetInt(SOUND_PREF, isMuted ? 1 : 0);
-        PlayerPrefs.Save();
-
-        UpdateSoundUI(isMuted);
+        PlayerPrefs.SetInt("SFX", isOn ? 1 : 0);
     }
 
-    private void ChangeBackgroundColor()
+    // Background colors
+    private Color[] backgroundColors =
+    {
+        Color.white,
+        new Color(0.0f, 0.5f, 0.0f), 
+        new Color(1.0f, 0.65f, 0.0f) 
+    };
+    // Cycle Background Colors and Apply to All Panels
+    public void ChangeBackgroundColor()
     {
         currentColorIndex = (currentColorIndex + 1) % backgroundColors.Length;
-        PlayerPrefs.SetInt(COLOR_PREF, currentColorIndex);
-        PlayerPrefs.Save();
 
-        ApplyBackgroundColor();
+        foreach (GameObject panel in backgroundPanels)
+        {
+            if (panel != null)
+            {
+                panel.GetComponent<Image>().color = backgroundColors[currentColorIndex]; // Apply to All Panels
+            }
+        }
+
+        PlayerPrefs.SetInt("BackgroundColorIndex", currentColorIndex);
     }
 
-    private void UpdateMusicUI(bool isMuted)
+    // Load Previous Settings
+    private void LoadSettings()
     {
-        musicButtonIcon.sprite = isMuted ? musicOffSprite : musicOnSprite;
-        AudioListener.pause = isMuted; // Mutes all background music
-    }
+        // Load Music Volume
+        if (musicSlider != null)
+        {
+            float savedVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            musicSlider.value = savedVolume;
+            if (backgroundMusic != null) backgroundMusic.volume = savedVolume;
+        }
 
-    private void UpdateSoundUI(bool isMuted)
-    {
-        soundEffectsButtonIcon.sprite = isMuted ? soundOffSprite : soundOnSprite;
-        AudioListener.volume = isMuted ? 0f : 1f; // Mutes all sound effects
-    }
+        // Load Sound Effects Toggle
+        if (sfxToggle != null)
+        {
+            sfxToggle.isOn = PlayerPrefs.GetInt("SFX", 1) == 1;
+        }
 
-    private void ApplyBackgroundColor()
-    {
-        Camera.main.backgroundColor = backgroundColors[currentColorIndex];
+        // Load Background Color
+        currentColorIndex = PlayerPrefs.GetInt("BackgroundColorIndex", 0);
+        foreach (GameObject panel in backgroundPanels)
+        {
+            if (panel != null)
+            {
+                panel.GetComponent<Image>().color = backgroundColors[currentColorIndex];
+            }
+        }
     }
 }

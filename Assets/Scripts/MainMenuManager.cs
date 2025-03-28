@@ -1,7 +1,12 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// MenuManager script to manage the Main Menu UI
+/// Manage the visibility of different panels in the Main Menu
+/// </summary>
 public class MenuManager : MonoBehaviour
 {
     public GameObject mainPanel;
@@ -10,11 +15,15 @@ public class MenuManager : MonoBehaviour
     public GameObject aboutPanel;
     public GameObject StartButton;
 
+    // Ensure the main menu is visible at start
     private void Start()
     {
-        ShowMainPanel(); // Ensure the main menu is visible at start
+        ShowMainPanel(); 
     }
 
+    /// <summary>
+    /// Start the game by loading the Game Scene
+    /// </summary>
     public void StartGame()
     {
         SceneManager.LoadScene("GameScene"); // Load the game scene

@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+/// <summary>
+/// GameManager for Rock-Paper-Scissors game, Manages player and computer choices, and determines the winner.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public Text playerChoiceText;
@@ -15,12 +18,18 @@ public class GameManager : MonoBehaviour
     private Choice playerChoice = Choice.None;
     private Choice computerChoice = Choice.None;
 
+    // Dictionary to determine winning choices
     private Dictionary<Choice, Choice> winningChoices = new Dictionary<Choice, Choice>()
     {
         { Choice.Rock, Choice.Scissors },
         { Choice.Scissors, Choice.Paper },
         { Choice.Paper, Choice.Rock }
     };
+
+    /// <summary>
+    /// Player selects a choice (Rock, Paper, or Scissors)
+    /// </summary>
+    /// <param name="choice"></param>
 
     public void PlayerSelect(int choice)
     {
@@ -30,6 +39,9 @@ public class GameManager : MonoBehaviour
         playerChoiceText.text = "You chose: " + playerChoice.ToString();
     }
 
+    /// <summary>
+    /// Computer generates a random choice and determines the winner
+    /// </summary>
     public void Shoot()
     {
         if (playerChoice == Choice.None) return;
@@ -69,7 +81,9 @@ public class GameManager : MonoBehaviour
     }
 
 
-    //Close button returns to main menu scene
+    /// <summary>
+    /// Close the game and return to the Main Menu
+    /// </summary>
     public void Close()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
