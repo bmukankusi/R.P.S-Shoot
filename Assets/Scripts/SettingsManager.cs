@@ -19,24 +19,22 @@ public class SettingsManager : MonoBehaviour
     
     private int currentColorIndex = 0;
 
-    private AudioSource backgroundMusic; 
+    private AudioSource backgroundMusic;
 
-    void Start()
+
+    private void Start()
     {
-        // Find and Assign Background Music
-        backgroundMusic = GameObject.FindWithTag("BackgroundMusic")?.GetComponent<AudioSource>();
-
-        //  Load Previous Settings
+        // Load settings when the settings menu opens
         LoadSettings();
 
-        //  Add Click Listener for Background Color Change
-        if (backgroundChangeButton != null)
-            backgroundChangeButton.onClick.AddListener(ChangeBackgroundColor);
-
-        //  Attach Slider Listener
         if (musicSlider != null)
-            musicSlider.onValueChanged.AddListener(SetMusicVolume);
+            musicSlider.onValueChanged.AddListener((value) => AudioManager.instance.SetMusicVolume(value));
+
+        if (sfxToggle != null)
+            sfxToggle.onValueChanged.AddListener((isOn) => AudioManager.instance.ToggleSFX(isOn));
     }
+
+   
 
     /// <summary>
     /// Set Music Volume, and Save to PlayerPrefs
@@ -51,17 +49,37 @@ public class SettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 
-    // Enable/Disable Sound Effects
+    // Enable/Disable Sound Effects Globally
     public void ToggleSFX(bool isOn)
     {
+
+        //Debug.Log("Applying SFX Toggle: " + isOn); 
         PlayerPrefs.SetInt("SFX", isOn ? 1 : 0);
+        ApplySFXSettings(isOn);
     }
+
+    /// <summary>
+    /// Apply SFX Settings to All AudioSources with "SFX" Tag
+    /// </summary>
+    /// <param name="isOn"></param>
+    private void ApplySFXSettings(bool isOn)
+    {
+        AudioSource[] sfxSources = FindObjectsOfType<AudioSource>(); 
+        foreach (AudioSource sfx in sfxSources)
+        {
+            if (sfx.CompareTag("SFX")) // Ensure it's a button sound effect
+            {
+                sfx.mute = !isOn;
+            }
+        }
+    }
+
 
     // Background colors
     private Color[] backgroundColors =
     {
         Color.white,
-        new Color(0.0f, 0.5f, 0.0f), 
+        new Color(0.0f, 0.5f, 0.0f), //Green
         new Color(1.0f, 0.65f, 0.0f) 
     };
     // Cycle Background Colors and Apply to All Panels

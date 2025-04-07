@@ -8,23 +8,24 @@ using UnityEngine.UI;
 /// </summary>
 public class ButtonSound : MonoBehaviour
 {
-    public AudioClip clickSound; // Assign in Inspector
+    public AudioClip clickSound; 
     private AudioSource audioSource;
 
     void Start()
     {
-        audioSource = FindObjectOfType<AudioSource>(); // Finds the AudioSource in the scene
+        audioSource = FindObjectOfType<AudioSource>(); 
     }
 
     /// <summary>
     /// Play sound effect when button is clicked
+    /// Ensures the audio plays only once per click
     /// </summary>
 
     public void PlaySound()
     {
         if (audioSource != null && clickSound != null)
         {
-            audioSource.PlayOneShot(clickSound); // Play sound effect once
+            audioSource.PlayOneShot(clickSound); 
         }
     }
 }

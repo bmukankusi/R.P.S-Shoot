@@ -37,6 +37,10 @@ public class MenuManager : MonoBehaviour
         aboutPanel.SetActive(false);
     }
 
+    /// <summary>
+    /// Show the settings panel and hide the main menu
+    /// </summary>
+
     public void ShowSettingsPanel()
     {
         mainPanel.SetActive(false);

@@ -3,6 +3,17 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 /// <summary>
+/// Enum representing the possible choices in the game.
+/// </summary>
+public enum Choice
+{
+    Rock,
+    Paper,
+    Scissors,
+    None
+}
+
+/// <summary>
 /// GameManager for Rock-Paper-Scissors game, Manages player and computer choices, and determines the winner.
 /// </summary>
 public class GameManager : MonoBehaviour
@@ -13,12 +24,9 @@ public class GameManager : MonoBehaviour
     public Button shootButton;
     public Button replayButton;
     public Button closeButton;
-
-    private enum Choice { Rock, Paper, Scissors, None }
     private Choice playerChoice = Choice.None;
     private Choice computerChoice = Choice.None;
-
-    // Dictionary to determine winning choices
+    // / Dictionary to hold winning choices
     private Dictionary<Choice, Choice> winningChoices = new Dictionary<Choice, Choice>()
     {
         { Choice.Rock, Choice.Scissors },
@@ -50,7 +58,7 @@ public class GameManager : MonoBehaviour
         computerChoice = (Choice)Random.Range(0, 3);
         computerChoiceText.text = "Computer chose: " + computerChoice.ToString();
 
-        // Determine winner
+        // Determine the winner
         if (playerChoice == computerChoice)
         {
             resultText.text = "It's a Tie!";
@@ -69,6 +77,7 @@ public class GameManager : MonoBehaviour
         replayButton.interactable = true;
     }
 
+
     public void Replay()
     {
         playerChoice = Choice.None;
@@ -82,7 +91,7 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// Close the game and return to the Main Menu
+    /// Close the game and return to the Main Menu/Menu Scene
     /// </summary>
     public void Close()
     {

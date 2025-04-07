@@ -11,7 +11,7 @@ public class WelcomeScreen : MonoBehaviour
 {
     private void Start()
     {
-        Invoke("LoadMainMenu", 2.5f); // Wait for 3 seconds
+        Invoke("LoadMainMenu", 2f); // Wait for 2 seconds
     }
 
     void LoadMainMenu()
